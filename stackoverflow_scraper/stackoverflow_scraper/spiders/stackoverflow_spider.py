@@ -21,12 +21,7 @@ class StackOverflowSpider(scrapy.Spider):
     name = "stackoverflow_spider"
     allowed_domains = ["stackoverflow.com"]
 
-    error_tags = [
-        "error-handling", "compiler-errors", "runtime-error", "syntax-error",
-        "typeerror", "linker-errors", "importerror", "attributeerror", "fatal-error",
-        "valueerror", "internal-server-error", "http-error", "parse-error", "error-code",
-        "build-error", "custom-errors", "ioerror", "index-error"
-    ]
+    error_tags = ['mysql-error-1292', 'internal-compiler-error', 'mysql-error-1067', 'errortemplate', 'extract-error-message', 'recursionerror', 'sslerrorhandler', 'flutter-renderflex-error', 'mysql-error-1025', 'startup-error', 'mysql-error-2013', 'mysql-error-1044', 'error-recovery', 'mysql-error-1068', 'mysql-error-1066', 'error-messages-for', 'better-errors-gem', 'jsondecodeerror', 'mat-error', 'strerror', 'mysql-error-1136', 'mysql-error-1267', 'mysql-error-1142', 'write-error', 'mysql-error-2006', 'abstractmethoderror', 'eoserror', 'ckerror', 'classformaterror', 'didfailwitherror', 'mysql-error-1364', 'mysql-error', 'nsxmlparsererrordomain']
 
     max_posts_per_tag = None
 

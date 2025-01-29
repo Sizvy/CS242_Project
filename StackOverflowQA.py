@@ -57,7 +57,7 @@ def fetch_questions(tag="runtime-error", pagesize=100):
 
 def fetch_answers(question_ids):
     answers = {}
-    chunk_size = 20  
+    chunk_size = 100  
     for i in range(0, len(question_ids), chunk_size):
         chunk = question_ids[i:i + chunk_size]
         print(f"Fetching answers for question IDs: {chunk}")
@@ -75,6 +75,13 @@ def fetch_answers(question_ids):
             continue
 
         data = response.json()
+
+        if "backoff" in data:
+            backoff_time = data["backoff"]
+            print(f"API requests throttled. Backing off for {backoff_time} seconds...")
+            time.sleep(backoff_time)
+            continue
+
         for answer in data.get("items", []):
             question_id = answer.get("question_id")
             if question_id:
@@ -108,7 +115,7 @@ def save_to_json(filename, questions, answers):
 
 if __name__ == "__main__":
     # Fetch all questions with the tag "runtime-error"
-    questions = fetch_questions(tag="compiler-errors")
+    questions = fetch_questions(tag="internal-server-error")
     print(f"Fetched {len(questions)} questions.")
 
     # Fetch answers for the fetched questions
