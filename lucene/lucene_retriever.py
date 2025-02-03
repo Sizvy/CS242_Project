@@ -43,7 +43,7 @@ def remove_duplicate_titles(results):
             seen_titles.add(norm_title)
             unique_results.append(res)
 
-        if len(unique_results) == 5:  ### stop at top 5 after removing duplicates
+        if len(unique_results) == 15:  ### stop at top 5 after removing duplicates
             break
 
     return unique_results
@@ -111,7 +111,46 @@ def display_results(results):
     console.print(table)
     console.print("\n[bold green]✅ Found top results![/bold green] See details above 👆")
 
+def paginate_results(results):
+    """Displays results with pagination."""
+    page_size = 5
+    total_pages = (len(results) + page_size - 1) // page_size
+    current_page = 0
+
+    while True:
+        start = current_page * page_size
+        end = start + page_size
+        console.clear()
+        console.print(f"\n[bold cyan]Page {current_page + 1} of {total_pages}[/bold cyan]\n")
+
+        display_results(results[start:end])
+
+        if total_pages == 1:
+            break  # No need for pagination if only one page
+
+        console.print("[bold yellow]Press d for next page, a for previous, or [q] to quit.[/bold yellow]")
+
+        key = input().strip().lower()
+        if key == "q":
+            break
+        elif key == "d" and current_page < total_pages - 1:
+            current_page += 1
+        elif key == "a" and current_page > 0:
+            current_page -= 1
+
+def get_valid_query():
+    """Prompts user for a search query and ensures it's valid."""
+    while True:
+        query = input("🔍 Enter your search query: ").strip()
+        if query:
+            return query
+        console.print("\n[bold red]⚠️ Query cannot be empty. Please enter a valid search term.[/bold red]")
+
 if __name__ == "__main__":
-    query = input("🔍 Enter your search query: ")
-    results = search_stackoverflow(query, field="body")
-    display_results(results)
+    query = get_valid_query()
+    
+    try:
+        results = search_stackoverflow(query, field="body")
+        paginate_results(results)
+    except Exception as e:
+        console.print(f"\n[bold red]⚠️ Error processing query:[/bold red] {e}")
