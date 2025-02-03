@@ -70,7 +70,7 @@ def search_stackoverflow(query_str, field="title", top_k=100):
         answer_snippet = (answers[:150] + "...") if answers else "No answer available"
 
         ### prioritize answers with more than 1000 characters
-        priority = 1 if len(answers) > 1000 else 0
+        priority = 2 if title.lower() == query_str.lower() else (1 if len(answers) > 1000 else 0)
 
         results.append({
             "title": title, "link": link, "tags": tags,
