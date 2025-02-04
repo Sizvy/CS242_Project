@@ -65,12 +65,14 @@ def index_stackoverflow_data(json_file):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        index_stackoverflow_data('/home/cs242/group_6/stackoverflow_data_set_5.json')
-        index_stackoverflow_data('/home/cs242/group_6/stackoverflow_data_set_3.json')
-        index_stackoverflow_data('/home/cs242/group_6/stackoverflow_data_set_41.json')
-        index_stackoverflow_data('/home/cs242/group_6/stackoverflow_data_set_42.json')
-        index_stackoverflow_data('/home/cs242/group_6/stackoverflow_data_set_31.json')
-        index_stackoverflow_data('/home/cs242/group_6/stackoverflow_data_set_2.json')
+        index_stackoverflow_data('../Data/group_6/stackoverflow_data_set_5.json')
+        index_stackoverflow_data('../Data/group_6/stackoverflow_data_set_3.json')
+        index_stackoverflow_data('../Data/group_6/stackoverflow_data_set_41.json')
+        index_stackoverflow_data('../Data/group_6/stackoverflow_data_set_42.json')
+        index_stackoverflow_data('../Data/group_6/stackoverflow_data_set_31.json')
+        index_stackoverflow_data('../Data/group_6/stackoverflow_data_set_1.json')
+        index_stackoverflow_data('../Data/group_6/stackoverflow_data_set_2.json')
+        index_stackoverflow_data('../Data/group_6/stackoverflow_data_java.json')
     else:
         index_stackoverflow_data(sys.argv[1])
 
