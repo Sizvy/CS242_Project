@@ -2,3 +2,5 @@
 My_Project_Materials
 Data
 lucene/stackoverflow_index
+.idea
+__pycache__
