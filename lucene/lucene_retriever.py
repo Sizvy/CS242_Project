@@ -1,11 +1,15 @@
 import lucene
 import os
 import re
+import sys
 from org.apache.lucene.analysis.standard import StandardAnalyzer
 from org.apache.lucene.index import DirectoryReader
 from org.apache.lucene.store import SimpleFSDirectory
 from org.apache.lucene.search import IndexSearcher
 from org.apache.lucene.queryparser.classic import QueryParser
+from org.apache.lucene.queryparser.classic import QueryParserBase
+from org.apache.lucene.queryparser.classic import MultiFieldQueryParser
+from org.apache.lucene.search import BooleanQuery, BooleanClause
 from java.nio.file import Paths
 from rich.console import Console
 from rich.table import Table
@@ -48,8 +52,13 @@ def remove_duplicate_titles(results):
 
     return unique_results
 
+def escape_lucene_query(query_str):
+    """Escapes special characters in Lucene queries."""
+    return QueryParserBase.escape(query_str)
+
 def search_stackoverflow(query_str, field="title", top_k=100):
     """searches stackoverflow index and sorts results"""
+    query_str = escape_lucene_query(query_str)
     query_parser = QueryParser(field, analyzer)
     query = query_parser.parse(query_str)
 
@@ -83,6 +92,8 @@ def search_stackoverflow(query_str, field="title", top_k=100):
 
     ### remove duplicate or similar titles
     return remove_duplicate_titles(results)
+
+
 
 def display_results(results):
     """displays search results in a structured, easy-to-read table"""
@@ -128,7 +139,7 @@ def paginate_results(results):
         if total_pages == 1:
             break  # No need for pagination if only one page
 
-        console.print("[bold yellow]Press d for next page, a for previous, or [q] to quit.[/bold yellow]")
+        console.print("[bold yellow]Press d for next page, a for previous, or q to quit.[/bold yellow]")
 
         key = input().strip().lower()
         if key == "q":
@@ -138,10 +149,11 @@ def paginate_results(results):
         elif key == "a" and current_page > 0:
             current_page -= 1
 
+
 def get_valid_query():
-    """Prompts user for a search query and ensures it's valid."""
     while True:
-        query = input("🔍 Enter your search query: ").strip()
+        console.print("🔍 Enter your search query (Press Ctrl+D when done): ")
+        query = sys.stdin.read().strip()
         if query:
             return query
         console.print("\n[bold red]⚠️ Query cannot be empty. Please enter a valid search term.[/bold red]")
@@ -154,3 +166,4 @@ if __name__ == "__main__":
         paginate_results(results)
     except Exception as e:
         console.print(f"\n[bold red]⚠️ Error processing query:[/bold red] {e}")
+
