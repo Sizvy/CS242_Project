@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack Overflow Search</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            margin-top: 20px;
+        }
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .result-link {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .result-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Stack Overflow Search</h2>
+        <div class="input-group mb-3">
+            <input type="text" id="query" class="form-control" placeholder="Enter search query">
+            <button class="btn btn-primary" onclick="search()">Search</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function search() {
+            let query = document.getElementById('query').value;
+            if (!query) {
+                alert("Please enter a search query.");
+                return;
+            }
+
+            $.ajax({
+                url: "/api/search",  // Updated URL to match the Flask route
+                type: "GET",         // Changed to GET
+                data: { query: query },  // Send data as query parameters
+                success: function(response) {
+                    displayResults(response);
+                },
+                error: function() {
+                    alert("Error fetching search results.");
+                }
+            });
+        }
+
+        function displayResults(results) {
+            let resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = "";
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = "<p class='text-danger'>No results found.</p>";
+                return;
+            }
+
+            results.forEach((result, index) => {
+                let card = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="result-title">${result.title}</h5>
+                            <p class="text-muted">${result.problem_statement}</p>
+                            <a href="${result.link}" target="_blank" class="result-link">🔗 View Discussion</a>
+                        </div>
+                    </div>
+                `;
+                resultsDiv.innerHTML += card;
+            });
+        }
+    </script>
+</body>
+</html>

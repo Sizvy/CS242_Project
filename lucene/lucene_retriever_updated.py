@@ -17,7 +17,11 @@ from rich.text import Text
 import time
 
 ### initialize lucene jvm
-lucene.initVM()
+if not lucene.getVMEnv():
+    print("Initializing JVM at retriever...")
+    lucene.initVM(vmargs=['-Djava.awt.headless=true'])
+else:
+    print("JVM is already running.")
 
 ### open index directory
 index_dir = "stackoverflow_index"
