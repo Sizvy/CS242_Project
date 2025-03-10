@@ -153,13 +153,74 @@
             margin-right: 8px; /* Adjust spacing */
         }
         .search-method-toggle {
-            margin-top: 10px;
+            margin-top: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 10px;
         }
-        .search-method-toggle label {
-            margin: 0 10px;
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .dark-mode .slider {
+            background-color: #555;
+        }
+        .dark-mode input:checked + .slider {
+            background-color: #bb86fc;
+        }
+        .search-method-label {
+            font-size: 1rem;
+            font-weight: bold;
+            color: inherit;
+        }
+        #llm-response {
+            margin-top: 30px;
+        }
+        #llm-response-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .dark-mode #llm-response-content {
+            background-color: #1e1e1e;
+            color: #ffffff;
         }
     </style>
 </head>
@@ -179,12 +240,12 @@
 
         <!-- Search Method Toggle -->
         <div class="search-method-toggle">
-            <label>
-                <input type="radio" name="search-method" value="lucene" checked> Lucene
+            <span class="search-method-label">Lucene</span>
+            <label class="switch">
+                <input type="checkbox" id="search-method-toggle">
+                <span class="slider"></span>
             </label>
-            <label>
-                <input type="radio" name="search-method" value="bert"> BERT
-            </label>
+            <span class="search-method-label">BERT</span>
         </div>
 
         <div class="loading-spinner" id="loading-spinner">
@@ -193,6 +254,13 @@
             </div>
         </div>
 
+        <!-- LLM Response Section -->
+        <div id="llm-response" style="display: none;">
+            <h4>🤖 AI-Generated Answer</h4>
+            <div id="llm-response-content" class="card p-3"></div>
+        </div>
+
+        <!-- Search Results Section -->
         <div id="results"></div>
         <nav id="pagination" class="pagination justify-content-center" style="display: none;">
             <button class="page-item page-link" onclick="prevPage()">←</button>
@@ -222,31 +290,36 @@
                 return;
             }
 
-            // Get the selected search method
-            let searchMethod = document.querySelector('input[name="search-method"]:checked').value;
-
             // Show loading spinner
             document.getElementById('loading-spinner').style.display = 'block';
 
-            $.ajax({
-                url: "/api/search",
-                type: "GET",
-                data: { query: query, method: searchMethod },
-                success: function(response) {
-                    results = response;
+            // Fetch LLM response
+            fetch(`/api/llm?query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Display LLM response
+                    document.getElementById('llm-response').style.display = 'block';
+                    document.getElementById('llm-response-content').innerHTML = data.llm_response;
+
+                    // Fetch search results
+                    let searchMethod = document.getElementById('search-method-toggle').checked ? 'bert' : 'lucene';
+                    return fetch(`/api/search?query=${encodeURIComponent(query)}&method=${searchMethod}`);
+                })
+                .then(response => response.json())
+                .then(data => {
+                    results = data;
                     totalResults = results.length;
                     currentPage = 0;
                     displayResults(currentPage);
                     updatePagination();
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                })
+                .finally(() => {
                     // Hide loading spinner
                     document.getElementById('loading-spinner').style.display = 'none';
-                },
-                error: function() {
-                    alert("Error fetching search results.");
-                    // Hide loading spinner
-                    document.getElementById('loading-spinner').style.display = 'none';
-                }
-            });
+                });
         }
 
         function displayResults(page) {
@@ -314,6 +387,13 @@
             isDarkMode = !isDarkMode;
             document.body.classList.toggle('dark-mode', isDarkMode);
             this.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i> Light Mode' : '<i class="fas fa-moon"></i> Dark Mode';
+        });
+
+        // Search method toggle label color change
+        document.getElementById('search-method-toggle').addEventListener('change', function() {
+            let labels = document.querySelectorAll('.search-method-label');
+            labels[0].style.color = this.checked ? '#ccc' : '#000';
+            labels[1].style.color = this.checked ? '#000' : '#ccc';
         });
     </script>
 </body>

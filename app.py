@@ -9,6 +9,7 @@ if not lucene.getVMEnv():
 else:
     print("JVM is already running.")
 
+from LLM import query_llm  # Import the query_llm function
 from lucene_retriever_updated import search_stackoverflow
 
 # Load Faiss index and metadata for BERT-based search
@@ -59,6 +60,34 @@ def api_search():
         results = search_stackoverflow(query, field="body")
 
     return jsonify(results)
+
+# New route for query_llm
+@app.route('/api/llm', methods=['GET'])
+def api_llm():
+    query = request.args.get('query', '').strip()
+    if not query:
+        return jsonify({"error": "Query parameter is required"}), 400
+
+    # Attach the current thread to the JVM
+    vm_env = lucene.getVMEnv()
+    if vm_env:
+        print("Attaching thread to JVM...")
+        vm_env.attachCurrentThread()
+    else:
+        return jsonify({"error": "JVM is not running"}), 500
+
+    # Call the query_llm function
+    result = query_llm(query)
+    if isinstance(result, tuple):
+        llm_response, results = result
+    else:
+        llm_response = result
+        results = []
+
+    return jsonify({
+        "llm_response": llm_response,
+        "results": results
+    })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
