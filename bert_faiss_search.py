@@ -108,14 +108,16 @@ def search_similar(query_embedding, index, metadata, top_k=5):
     faiss_search_start = time.time()
     distances, indices = index.search(query_embedding, top_k)
     faiss_search_time = time.time() - faiss_search_start
-
     ### collect results
     results = []
     for idx, dist in zip(indices[0], distances[0]):
+        body = metadata[idx]["body"]
+        problem_snippet = body[:150] + "..." if body else "No description"
         results.append({
             "title": metadata[idx]["title"],
             "link": metadata[idx]["link"],
             "tags": metadata[idx]["tags"],
+            "problem_statement": problem_snippet,
             "distance": float(dist)
         })
 
