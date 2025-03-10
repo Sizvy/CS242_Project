@@ -5,16 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stack Overflow Search</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
         body {
             background-color: #f8f9fa;
+            color: #000000; /* Default text color for light mode */
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff; /* Default text color for dark mode */
         }
         .container {
             margin-top: 50px;
         }
         .card {
             margin-top: 20px;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
         .result-title {
             font-size: 1.2rem;
@@ -27,20 +40,162 @@
         .result-link:hover {
             text-decoration: underline;
         }
+        .pagination {
+            margin-top: 20px;
+        }
+        .page-item {
+            margin: 0 5px;
+        }
+        .page-item .page-link {
+            border: none;
+            background: none;
+            color: inherit;
+        }
+        .dark-mode .card {
+            background-color: #1e1e1e;
+            color: #ffffff; /* Text color for cards in dark mode */
+        }
+        .dark-mode .result-link {
+            color: #bb86fc; /* Link color for dark mode */
+        }
+        .dark-mode .pagination .page-link {
+            color: #ffffff; /* Pagination arrow color for dark mode */
+            background-color: transparent; /* Remove white background */
+        }
+        .dark-mode .pagination .page-link:hover {
+            background-color: #333; /* Hover background for pagination arrows */
+        }
+        .dark-mode .text-muted {
+            color: #a0a0a0 !important; /* Light gray color for muted text in dark mode */
+        }
+        .mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode .footer {
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border: 2px solid #007bff;
+            border-radius: 25px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-box input:focus {
+            border-color: #0056b3;
+        }
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #007bff;
+            transition: color 0.3s;
+        }
+        .search-icon:hover {
+            color: #0056b3;
+        }
+        .dark-mode .search-icon {
+            color: #ffffff; /* White search icon in dark mode */
+        }
+        .dark-mode .search-box input {
+            border-color: #bb86fc; /* Purple border in dark mode */
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+        .dark-mode .search-box input:focus {
+            border-color: #9c27b0; /* Darker purple on focus in dark mode */
+        }
+        .tags {
+            margin-top: 10px;
+        }
+        .tag {
+            display: inline-block;
+            background-color: #e1ecf4;
+            color: #39739d;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 5px;
+            font-size: 0.9rem;
+        }
+        .dark-mode .tag {
+            background-color: #2c3e50;
+            color: #bb86fc;
+        }
+        .stackoverflow-logo {
+            width: 16px; /* Smaller logo size */
+            height: 16px; /* Smaller logo size */
+            margin-right: 8px; /* Adjust spacing */
+        }
     </style>
 </head>
 <body>
+    <div class="mode-toggle">
+        <button id="mode-toggle" class="btn btn-secondary">
+            <i class="fas fa-moon"></i> Dark Mode
+        </button>
+    </div>
+
     <div class="container">
         <h2 class="text-center">Stack Overflow Search</h2>
-        <div class="input-group mb-3">
-            <input type="text" id="query" class="form-control" placeholder="Enter search query">
-            <button class="btn btn-primary" onclick="search()">Search</button>
+        <div class="search-box">
+            <input type="text" id="query" placeholder="Search the web" onkeypress="handleKeyPress(event)">
+            <i class="fas fa-search search-icon" onclick="search()"></i>
+        </div>
+
+        <div class="loading-spinner" id="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
 
         <div id="results"></div>
+        <nav id="pagination" class="pagination justify-content-center" style="display: none;">
+            <button class="page-item page-link" onclick="prevPage()">←</button>
+            <span id="page-info" class="page-item page-link"></span>
+            <button class="page-item page-link" onclick="nextPage()">→</button>
+        </nav>
     </div>
 
     <script>
+        let currentPage = 0;
+        let pageSize = 5;
+        let totalResults = 0;
+        let results = [];
+        let isDarkMode = false;
+
+        // Function to handle search on Enter key press
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                search();
+            }
+        }
+
         function search() {
             let query = document.getElementById('query').value;
             if (!query) {
@@ -48,34 +203,54 @@
                 return;
             }
 
+            // Show loading spinner
+            document.getElementById('loading-spinner').style.display = 'block';
+
             $.ajax({
-                url: "/api/search",  // Updated URL to match the Flask route
-                type: "GET",         // Changed to GET
-                data: { query: query },  // Send data as query parameters
+                url: "/api/search",
+                type: "GET",
+                data: { query: query },
                 success: function(response) {
-                    displayResults(response);
+                    results = response;
+                    totalResults = results.length;
+                    currentPage = 0;
+                    displayResults(currentPage);
+                    updatePagination();
+                    // Hide loading spinner
+                    document.getElementById('loading-spinner').style.display = 'none';
                 },
                 error: function() {
                     alert("Error fetching search results.");
+                    // Hide loading spinner
+                    document.getElementById('loading-spinner').style.display = 'none';
                 }
             });
         }
 
-        function displayResults(results) {
+        function displayResults(page) {
             let resultsDiv = document.getElementById("results");
             resultsDiv.innerHTML = "";
-            
+
             if (results.length === 0) {
                 resultsDiv.innerHTML = "<p class='text-danger'>No results found.</p>";
                 return;
             }
 
-            results.forEach((result, index) => {
+            let start = page * pageSize;
+            let end = start + pageSize;
+            let pageResults = results.slice(start, end);
+
+            pageResults.forEach((result, index) => {
+                let tagsHtml = result.tags ? result.tags.split(',').map(tag => `<span class="tag">${tag.trim()}</span>`).join('') : '';
                 let card = `
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="result-title">${result.title}</h5>
+                            <div style="display: flex; align-items: center;">
+                                <img src="https://cdn.sstatic.net/Sites/stackoverflow/Img/apple-touch-icon.png" class="stackoverflow-logo" alt="Stack Overflow Logo">
+                                <h5 class="result-title">${result.title}</h5>
+                            </div>
                             <p class="text-muted">${result.problem_statement}</p>
+                            <div class="tags">${tagsHtml}</div>
                             <a href="${result.link}" target="_blank" class="result-link">🔗 View Discussion</a>
                         </div>
                     </div>
@@ -83,6 +258,41 @@
                 resultsDiv.innerHTML += card;
             });
         }
+
+        function updatePagination() {
+            let paginationDiv = document.getElementById("pagination");
+            let pageInfo = document.getElementById("page-info");
+
+            if (totalResults > pageSize) {
+                paginationDiv.style.display = "flex";
+                pageInfo.textContent = `Page ${currentPage + 1} of ${Math.ceil(totalResults / pageSize)}`;
+            } else {
+                paginationDiv.style.display = "none";
+            }
+        }
+
+        function nextPage() {
+            if ((currentPage + 1) * pageSize < totalResults) {
+                currentPage++;
+                displayResults(currentPage);
+                updatePagination();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                displayResults(currentPage);
+                updatePagination();
+            }
+        }
+
+        // Dark mode toggle
+        document.getElementById('mode-toggle').addEventListener('click', function() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            this.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i> Light Mode' : '<i class="fas fa-moon"></i> Dark Mode';
+        });
     </script>
 </body>
 </html>
