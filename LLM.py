@@ -12,7 +12,7 @@ set_seed(42)
 
 console = Console()
 
-os.environ['HF_TOKEN']="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"
+os.environ['HF_TOKEN']="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" #Backup token = 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
 login(token = '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')
 
 # Hugging Face API setup
@@ -85,6 +85,6 @@ if __name__ == "__main__":
     console.print(Markdown(llm_response))  # Format as Markdown for better readability
 
     # Display Lucene search results
-    console.print("\n[bold yellow]🔍 Related Stack Overflow Discussions:[/bold yellow]\n")
-    paginate_results(results)  # Use the function from lucene_retriever.py
+    # console.print("\n[bold yellow]🔍 Related Stack Overflow Discussions:[/bold yellow]\n")
+    # paginate_results(results)  # Use the function from lucene_retriever.py
 
