@@ -78,9 +78,9 @@ To set up the project locally, follow these steps:
    
 ## Team
 This project was developed by Team 06 as part of the CS242 Course (Winter 2025). Team members:
-**G M Shahariar**
-**Md Taukir Azam Chowdhury**
-**Md. Olid Bhuiyan**
-**Samiha Khan**
+**G M Shahariar**,
+**Md Taukir Azam Chowdhury**,
+**Md. Olid Bhuiyan**,
+**Samiha Khan**,
 **Zabir Al Nazi**
    
