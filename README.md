@@ -73,11 +73,8 @@ To set up the project locally, follow these steps:
    ```bash
    Open your browser and navigate to http://localhost:8080.
 ## Usage
-Enter your query (e.g., a programming error) in the search bar.
-
-Choose between Lucene (keyword-based) or BERT (semantic) search.
-
-View the ranked results and AI-generated summaries.
-
-Click on any result to see more details.
+1. Enter your query (e.g., a programming error) in the search bar.
+2. Choose between Lucene (keyword-based) or BERT (semantic) search.
+3. View the ranked results and AI-generated summaries.
+4. Click on any result to see more details.
    
