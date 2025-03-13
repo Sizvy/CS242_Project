@@ -9,8 +9,6 @@ Welcome to the **CS242 Project** repository! This project is an AI-powered searc
 - [How It Works](#how-it-works)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Live Demo](#live-demo)
-- [Future Scope](#future-scope)
 - [Team](#team)
 
 ## Overview
@@ -77,4 +75,12 @@ To set up the project locally, follow these steps:
 2. Choose between Lucene (keyword-based) or BERT (semantic) search.
 3. View the ranked results and AI-generated summaries.
 4. Click on any result to see more details.
+   
+## Team
+This project was developed by Team 06 as part of the CS242 Course (Winter 2025). Team members:
+**G M Shahariar**
+**Md Taukir Azam Chowdhury**
+**Md. Olid Bhuiyan**
+**Samiha Khan**
+**Zabir Al Nazi**
    
