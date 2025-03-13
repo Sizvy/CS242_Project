@@ -1,15 +1,63 @@
-### Scraping
+# CS242 Project: StackOverflow Search Engine
 
- * We used scrapy.
- * Clone the repository, go to `stackoverflow_scraper/spiders/stackoverflow_spider.py` file and update the `error_tags`.
- * Go to `CS242_Project-master/stackoverflow_scraper` folder and run `scrapy crawl stackoverflow_spider --nolog`
+Welcome to the **CS242 Project** repository! This project is an AI-powered search engine designed to help developers quickly find solutions to programming errors by leveraging **Stack Overflow** data. The system combines **keyword-based search** (using Lucene) and **semantic search** (using BERT) to retrieve relevant answers, and it employs a **Large Language Model (LLM)** to generate concise and accurate solutions.
 
-### Json Data Splits
+## Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [How It Works](#how-it-works)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Live Demo](#live-demo)
+- [Future Scope](#future-scope)
+- [Team](#team)
+- [License](#license)
 
- * set_5 (Nabil)
-     - `["error-reporting","error-log","rounding-error","ioerror","custom-errors","nserror","standard-error","onerror"] `
-     - `['errorcontrolsystem', 'mysql-error-1349', 'setonerrorlistener', 'enotfound-error', 'mysql-error-1030', 'mysql-error-1040', 'mysql-error-1091', 'kotlin.notimplementederror', 'mysql-error-1415', 'application-onerror', 'error-response', 'illegalaccesserror', 'pg-column-does-not-exist-error', 'vs-error', 'error-kernel', 'aggregateerror', 'mysql-error-1416', 'mysql-error-1327', 'mysql-error-1007', 'mysql-error-1051', 'undefvarerror', 'network-error-logging', 'stale-if-error', 'mysql-error-1065', 'mysql-error-1138', 'mysql-error-1253', 'authentication-error', 'sitecore-error-manager', 'pbi.error']`
-     - `['javascript', 'rust', 'c#']` (partial)
- * set_3 (Olid)
-     - ` ["internal-server-error","modulenotfounderror","error-logging","http-error","nosuchmethoderror","build-error","index-error"] `
-     - `['mysql-error-1292', 'internal-compiler-error', 'mysql-error-1067', 'errortemplate', 'extract-error-message', 'recursionerror', 'sslerrorhandler', 'flutter-renderflex-error', 'mysql-error-1025', 'startup-error', 'mysql-error-2013', 'mysql-error-1044', 'error-recovery', 'mysql-error-1068', 'mysql-error-1066', 'error-messages-for', 'better-errors-gem', 'jsondecodeerror', 'mat-error', 'strerror', 'mysql-error-1136', 'mysql-error-1267', 'mysql-error-1142', 'write-error', 'mysql-error-2006', 'abstractmethoderror', 'eoserror', 'ckerror', 'classformaterror', 'didfailwitherror', 'mysql-error-1364', 'mysql-error', 'nsxmlparsererrordomain']`
+## Overview
+This project aims to streamline the process of finding solutions to programming errors by:
+1. **Scraping and indexing** error-related questions and answers from Stack Overflow.
+2. Providing **two search methods**:
+   - **Keyword-based search** using **Lucene**.
+   - **Semantic search** using **BERT** and **FAISS** for dense retrieval.
+3. Generating **AI-powered solutions** using a **Large Language Model (LLM)**.
+
+The system is backed by a **user-friendly web interface** that allows users to enter queries, view ranked solutions, and read AI-generated summaries.
+
+## Features
+- **Dual Search Modes**: Choose between **Lucene** (keyword-based) and **BERT** (semantic) search.
+- **AI-Powered Solutions**: The system uses **Qwen 2.5 3B Instruct** (via Hugging Face API) to generate concise and accurate answers.
+- **Interactive GUI**: A Flask-based web interface for real-time query processing and result display.
+- **Efficient Retrieval**: Combines **Lucene**, **BERT**, and **FAISS** for fast and accurate document retrieval.
+- **Live Demo**: Try out the system in real-time using the provided link.
+
+## Technologies Used
+- **Web Scraping**: Scrapy (for collecting Stack Overflow data).
+- **Indexing and Search**:
+  - **Sparse Retrieval**: Pylucene (Inverted Index, Vector Space Model, Okapi BM25).
+  - **Dense Retrieval**: BERT (🤗 Transformers) and FAISS for semantic search.
+- **Large Language Model**: Qwen 2.5 3B Instruct (via Hugging Face API).
+- **Backend**: Flask API for connecting search and AI models.
+- **Frontend**: HTML, CSS, JavaScript for the user interface.
+- **Deployment**: Hosted on a live server for real-time access.
+
+## How It Works
+1. **Data Collection**: Error-related questions, answers, tags, and comments are scraped from Stack Overflow using Scrapy.
+2. **Indexing**:
+   - **Lucene**: Creates an inverted index for fast keyword-based retrieval.
+   - **BERT**: Transforms text into contextualized embeddings for semantic search.
+3. **Search**:
+   - The user enters a query (e.g., a programming error).
+   - The system retrieves the top-k relevant documents using either Lucene or BERT.
+4. **LLM Integration**:
+   - The query and retrieved documents are sent to the LLM (Qwen 2.5 3B Instruct) via the Hugging Face API.
+   - The LLM generates a solution, which is displayed in the GUI.
+5. **Result Display**: The user sees ranked solutions with AI-generated summaries.
+
+## Installation
+To set up the project locally, follow these steps:
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Sizvy/CS242_Project.git
+   cd CS242_Project
