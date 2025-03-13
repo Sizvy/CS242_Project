@@ -12,7 +12,6 @@ Welcome to the **CS242 Project** repository! This project is an AI-powered searc
 - [Live Demo](#live-demo)
 - [Future Scope](#future-scope)
 - [Team](#team)
-- [License](#license)
 
 ## Overview
 This project aims to streamline the process of finding solutions to programming errors by:
@@ -61,3 +60,24 @@ To set up the project locally, follow these steps:
    ```bash
    git clone https://github.com/Sizvy/CS242_Project.git
    cd CS242_Project
+2. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+3. **Add your Hugging face API key**:
+   ```bash
+   HUGGING_FACE_API_KEY=your_api_key_here
+4. **Run the flask application**:
+   ```bash
+   python3 app.py
+5. **Access the GUI**:
+   ```bash
+   Open your browser and navigate to http://localhost:8080.
+## Usage
+Enter your query (e.g., a programming error) in the search bar.
+
+Choose between Lucene (keyword-based) or BERT (semantic) search.
+
+View the ranked results and AI-generated summaries.
+
+Click on any result to see more details.
+   
